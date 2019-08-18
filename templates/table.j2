@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <title>Mr & Ms Risci Pageant Results</title>
+        <style>
+            table.average{
+                margin: 7% auto;
+                padding:1%;
+                border:1px solid black;
+                max-width:30vw;
+            }
+            table.average tr th{
+                border:1px solid black;
+                font-size:100%;
+                font-weight:bold;
+                padding:3%;
+            }
+            table.average tr td{
+                border:1px solid black;
+                font-size:130%;
+                text-align:center;
+            }
+            table.average tr td.average{
+                color:blue;
+            }
+            table.attire{
+                margin: 7% 0;
+                padding:1%;
+                border:1px solid black;
+                max-width:50vw;
+            }
+            table.attire tr th{
+                border:1px solid black;
+                font-size:100%;
+                font-weight:bold;
+            }
+            table.attire tr td{
+                border:1px solid black;
+                font-size:130%;
+                color:blue;
+                text-align:center;
+            }
+            .criteria{
+                padding:3%;
+            }
+            .attire .header,.average .header{
+                font-size:150%;
+                font-weight:bolder;
+                font-family:"Century Gothic";
+            }
+            .tabheader{
+                font-size:300%;
+                font-weight:bolder;
+                font-family:"Century Gothic";
+                color:red;
+                text-align:center;
+            }
+            .tab {
+                margin:auto;
+                width:50%;
+                display:none;
+            }
+            .tabselector{
+                margin:auto;
+                display:flex;
+                width:30%;
+                border:1px solid black;
+                justify-content:space-between;
+            }
+            .tabselector>button{
+                width:30%;
+                padding:4%;
+                font-size:150%;
+            }
+        </style>
+        <script>
+            let tabs = ["table-1","table-2","table-3"];
+            function changeTab(buttonID){
+                tabID = "table-"+buttonID.substr(1,2);
+                for(i in tabs){
+                    if(tabs[i]==tabID) document.getElementById(tabs[i]).style.display = "block";
+                    else{ document.getElementById(tabs[i]).style.display = "none";}
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <table class="average">
+            <col width="5%">
+            <col width="20%">
+            <col width="10%">
+            <tr>
+                    <th class="header" colspan="3">AVERAGE</th>
+            </tr>
+            <tr>
+                <th>RANK</th>
+                <th>CONTESTANT NUMBER</th>
+                <th>AVERAGE</th>
+            </tr>
+            {% for num in range(1,totalContestantNum+1)%}
+            <tr>
+                <th>{{loop.index}}</th>
+                <td>Contestant {{num}}</td>
+                <td class="average">90.1%</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <div class="tabselector">
+        {% for tab in ["Male","Female","Average"] %}
+            <button onClick="changeTab('B{{loop.index}}')" id="B{{loop.index}}">{{tab}}</button>
+        {% endfor %}
+        </div>
+
+        {% set gender = ["M","F","A"]%}
+        {% for tab in ["Male","Female","Average"] %}
+            {% set gender_loop = loop%}
+            <div class="tab" id="table-{{loop.index}}">
+                <h1 class="tabheader">{{tab}}</h1>
+                {% for theme in themeList %}
+                    <table class="attire">
+                        <tr>
+                            <th class="header" colspan="{{totalContestantNum+1}}">{{theme|upper}}</th>
+                        </tr>
+                        <col width="20%">
+                        {% for num in range(1,totalContestantNum+1) %}
+                            <col width="5%">
+                        {% endfor %}
+                        <tr>
+                            <th class="criteria"></th>
+                            {% for num in range(1,totalContestantNum+1) %}
+                            <th>{{num}}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for criteria in criteriaList %}
+                        {% set criteria_loop = loop%}
+                        <tr>
+                            <th class="criteria">{{criteria}}</th>
+                            {% for x in range(1,totalContestantNum+1)%}
+                            <td> {{averageAttire[theme][x-1][gender[gender_loop.index-1]][criteriaShort[criteria_loop.index-1]]}} </td>
+                            {%endfor%}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </body>
+</html>

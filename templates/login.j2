@@ -1,0 +1,58 @@
+<html>
+    <head>
+        <script src="{{url_for('static' ,filename='lib/jquery-3.4.1.js')}}"> </script>
+        <script>
+            function form_validation(){
+                let input = $("#usrn").val();
+                let err_handler = $("#err-handler");
+                console.log(input)
+                if (input==""){
+                    err_handler.text('Username cannot be empty!') 
+                    return false;
+                } 
+                else return true;
+            }
+        </script>
+
+        <style>
+            body{
+                margin:0;
+                padding:0;
+
+            }
+            .form-handler{
+                background-color:green;
+                height:100%;
+                width:100%;
+            }
+            .form-handler>form{
+                display:flex;
+                flex-direction:column;
+                align-items: center;
+                margin:auto;
+                margin-top: 20vh;
+                width: 20%; 
+                height:40%;
+            }
+            input.usrn{
+                padding:3%;
+                text-align: center;
+                width:70%;
+            }
+            input.enter{
+                padding:2% 4%;
+
+            }
+        </style>
+    </head>
+    <body>
+        <div class="form-handler">
+            <br>
+            <form id="login-form" autocomplete="off" action="http://{{request.host}}/login-validate" onSubmit="return form_validation()" method="POST">
+                <input id="usrn" utocomplete="false" class="usrn" name="login-username" placeholder="Username"/>
+                <p id="err-handler" style="color:red;">{{error}}</p>
+                <input class="enter" type="submit" value="Enter"/>
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,14 @@
+<html>
+<head>
+    <script>
+        var counter = 3;
+        setInterval(()=>{
+            counter--;
+            if(counter < 0)window.open("http://{{request.host}}/","_self");
+            else {document.getElementById("seconds").innerHTML = counter;}
+        }, 1000)
+    </script>
+</head>
+<h1> LOGIN SUCCESS :{{username}}</h1>
+<br>
+<h1>Redirecting in <span id="seconds">3</span> seconds...</h1>

@@ -1,0 +1,90 @@
+<html>
+<head>
+    <title>Mr. & Ms. Risci</title>
+    <style>
+        @font-face {
+        font-family: "Stafford";
+        src: url("{{url_for('static',filename='styles/fonts/stafford.ttf')}}") format("truetype");
+        }
+        @keyframes hover{
+            0%{
+                margin-top: 10vh;
+            }
+            30%{
+                margin-top: 17vh;
+            }
+            70%, 100%{
+                margin-top: 10vh;
+            }
+        }
+
+        body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: {{bgColor}};
+        }
+
+        .loading-handler {
+        background-color: {{bgColor}};
+        height: 100%;
+        width: 100%;
+        padding: 1%;
+        }
+
+        .logo-container {
+        margin: auto;
+        margin-top: 10vh;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        width: 25vw;
+        overflow: hidden;
+        animation: hover 5s 0s infinite ease-in-out;
+        }
+
+        #mmr {
+        width: 100%;
+        }
+
+        #logo-bar-up {
+        width: 100%;
+        }
+
+        #logo-bar-down {
+        -webkit-transform: rotate(180deg);
+                transform: rotate(180deg);
+        width: 100%;
+        }
+
+        #logo-date {
+        font-family: "Stafford";
+        text-align: center;
+        font-size: 10vh;
+        color: #05386B;
+        margin-top: -10%;
+        margin-bottom: -10%;
+        }
+    </style>
+
+</head>
+<body>
+<div class="loading-handler">
+    <div class="logo-container">
+        <img id="mmr" src="{{url_for('static',filename='images/mmr.png')}}"/>
+        <img id="logo-bar-up" src="{{url_for('static',filename='images/bar.png')}}"/>
+        <span id="logo-date"><span style="font-size:7px;">&nbsp;</span>{{mmrdate}}</span>
+        <img id="logo-bar-down" src="{{url_for('static',filename='images/bar.png')}}"/>
+    </div>
+</div>
+</body>
+</html> 

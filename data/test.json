@@ -1,0 +1,14 @@
+[
+    {
+        "M": {
+            "creativeness": 30,
+            "stagepresence": 40,
+            "appropriateness": 10
+        },
+        "F": {
+            "creativeness": 30,
+            "stagepresence": 40,
+            "appropriateness": 10
+        }
+    }
+]

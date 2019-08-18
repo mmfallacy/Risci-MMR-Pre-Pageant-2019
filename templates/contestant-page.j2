@@ -1,0 +1,236 @@
+<html>
+    <head>
+        <title>Mr & Ms Risci Pageant Scoresheet: Contestant {{contestantnum}} </title>
+        <script src="{{url_for('static' ,filename='lib/jquery-3.4.1.js')}}"> </script>
+            {% set genders = ["M","F"] %}
+        <script>
+            var buttonList = [];
+            var currentInput;
+            var criteriaFull = {{criteriaList}};
+            var criteria = [];
+            var criteriaMax = {};
+            for(let criterion in criteriaFull){
+                _max = criteriaFull[criterion];
+                criterion = criterion.split("/",1)[0]
+                criterion = criterion.replace(/\s+/g,"")
+                criteria.push(criterion.toLowerCase());
+                criteriaMax[criterion.toLowerCase()] = _max;
+            }
+            console.log(criteriaMax);
+            var scores = {};
+            var indexButton = 0;
+            for(let x in {{genders}}){
+                for(let y in criteria){
+                    buttonList.push({{genders}}[x]+parseInt(++y)+"B")
+                }
+            }
+            if(!("contestant-{{contestantnum}}"in sessionStorage)){
+                for(let x in {{genders}}){
+                    scores[{{genders}}[x]]={};
+                }
+                for(let x in {{genders}}){
+                    for(let y in criteria){
+                        scores[{{genders}}[x]][criteria[y]]=-1;
+                    }
+                }
+            }
+            else {scores = JSON.parse(sessionStorage.getItem("contestant-{{contestantnum}}"))}
+            // FIXME: ESC ON NAVBAR
+            $(window).on("load",function(){
+                updateScorePlaceholder();
+                $("#score-input").on("keyup",function (event){
+                    if(event.which === 13){ // enter
+                        $('#score-submit').click();
+                        return false;  
+                    }
+                    if(event.which === 32){ // space
+                        event.preventDefault();
+                        return false;  
+                    }
+                
+                }); 
+                for(let i in criteriaMax){
+                    $(".score-max#MAX"+(criteria.indexOf(i)+1)).text("/"+criteriaMax[i]);
+                }
+                $("#score-input").on("input propertychange paste",function(){
+                    validateScore();
+                })
+            
+                $("#modal-element").on('keydown', function(e) {
+                    if(e.which == 40) {
+                        e.preventDefault(); // DOWNARROW
+                        $("#score-input").val("");
+                        if(++indexButton==buttonList.length) indexButton = 0;
+                        $("#"+buttonList[indexButton]).click();
+                    }
+                    if(e.which == 38){ // UP ARROW
+                        e.preventDefault();
+                        $("#score-input").val("");
+                        if(--indexButton==-1) indexButton = buttonList.length-1;
+                        $("#"+buttonList[indexButton]).click();
+                    }
+                    if(e.which == 27){ // ESC
+                        e.preventDefault();
+                        closeModal();
+                    }
+                });  
+            });
+            $(window).on("keydown",function(e){
+                if(e.which == 9){
+                    e.preventDefault();
+                    $("#"+buttonList[indexButton]).click();
+                }
+            });
+            function toggleModal(buttonID){
+                currentInput = buttonID.slice(0,-1);
+                indexButton = buttonList.indexOf(buttonID);
+                scoreIDX = buttonID.slice(0,1);
+                scoreIDY = criteria[parseInt(buttonID.slice(1,2))-1];
+                $("#modal-element").slideDown("slow");
+               
+                $("#score-input").focus();
+                currentGender = (buttonID.slice(0,1)==="M")? "Male":"Female";
+                $("#score-criteria").text(currentGender+": "+$("#"+currentInput+"C").text());
+                if(scores[scoreIDX][scoreIDY]!=-1)$("#score-input").val(scores[scoreIDX][scoreIDY]);
+            }
+            function closeModal(){
+                $("#modal-element").slideUp("slow");
+                $("#score-input").val('');
+                $("#score-error").text(" ");
+            }
+            $(window).click(function(event) {
+                if (event.target.id == "modal-element") {
+                    closeModal();
+                }
+            });
+            function validateScore(){
+                let input = $("#score-input").val();
+                let index = criteria[parseInt(currentInput.slice(1,2))-1];
+                if (/^0+/gi.test(input)) {
+                    $("#score-input").val('');
+                    return false;
+                }
+                if(isNaN(input)&&input!="-"){
+                    $("#score-error").text("Input is not a Number!");
+                    $("#score-input").val('');
+                    return false;
+                }
+                else if(parseInt(input)>criteriaMax[index]){
+                    $("#score-error").text("Max score input is "+criteriaMax[index]+    "!");
+                    $("#score-input").val(criteriaMax[index]);
+                    return false;
+                }
+                else if(parseInt(input)<0){
+                    $("#score-error").text("Input is a negative number!");
+                    $("#score-input").val(0);
+                    return false;
+                }
+                else if(input===""){
+                    $("#score-input").val('');
+                    input=-1;
+                    return input;
+                }
+                else {
+                    return input;
+                }
+            }
+            function resetScores(){
+                for(let x in {{genders}}){
+                    scores[{{genders}}[x]]={};
+                }
+                for(let x in {{genders}}){
+                    for(let y in criteria){
+                        scores[{{genders}}[x]][criteria[y]]=-1;
+                    }
+                }
+                sessionStorage.clear();
+                updateScorePlaceholder();
+            }
+            function changeScore(){
+                let indexX = currentInput.slice(0,-1);
+                let indexY = criteria[parseInt(currentInput.slice(1,2))-1];
+                let input = validateScore();
+                $("#score-error").text(" ")
+                if(!input) {return;}
+                scores[indexX][indexY]=parseInt(input);
+                //closeModal();
+                updateScorePlaceholder();
+                sessionStorage.setItem("contestant-{{contestantnum}}",JSON.stringify(scores));
+                activateUploadModal(checkIfUploadReady());
+            }
+            function updateScorePlaceholder(){
+                for(let index in scores){
+                    let genderID=index;
+                    for(let y in scores[genderID]){
+                        if(scores[genderID][y]!=-1){
+                            $("#"+genderID+(criteria.indexOf(y)+1).toString()).text(scores[genderID][y]);
+                            $("#"+genderID+(criteria.indexOf(y)+1).toString()+"I").text("")
+                        }
+                        else{
+                            $("#"+genderID+(criteria.indexOf(y)+1).toString()).text("");
+                            $("#"+genderID+(criteria.indexOf(y)+1).toString()+"I").text("(*)")
+                        }
+                    }
+                }
+            }
+        // FIXME: Remove after debugging!.
+        function checkSessionStorage(){
+            for(let i=0;i<sessionStorage.length;i++){
+                    console.log(sessionStorage.key(i));
+                    console.log(JSON.parse(sessionStorage.getItem(sessionStorage.key(i))));
+            }
+            console.log(scores);
+        }
+        </script>
+        <link rel="stylesheet" type="text/css" href="{{url_for('static' ,filename='styles/cpage.css')}}">
+
+
+    </head>
+    {% include "contestant-navbar.j2" %}
+    <div id="contestant-page">
+        <h1 class="contestant-number"> Contestant # {{contestantnum}}</h1>
+        {% for gender in genders %}
+        <div class="outer"> 
+            <div class="innerL">
+                <img class="cts" src="{{url_for('static',filename='images/'+contestantnum+'/1'+gender+'.png')}}">
+                <span>{{contestantdata[loop.index-1]["name"]}}</span><br>
+                <span>{{contestantdata[loop.index-1]["grSec"]}}</span>
+            </div>
+            <div class="innerR">
+                <div class="scoreWord">
+                    SCORE
+                </div>
+                <br>
+            {% for criteria in criteriaList %}
+                <div class="criteria_score">
+                    <span style="font-family: 'Visby';text-align:right;margin-top:3.5%;font-size: 150%;font-weight:bold;color:red;width:10%;overflow:hidden" id="{{gender + loop.index|string+'I'}}">(*)</span>
+                    <div class="criteria" id="{{gender + loop.index|string +'C'}}">
+                        {{criteria}}
+                    </div>
+                    <div class="score">
+                        <span class="score-placeholder" id="{{gender + loop.index|string}}"></span>
+                        <span class="score-max" id="{{'MAX'+loop.index|string}}"></span>
+                        <button id="{{gender + loop.index|string +'B'}}" onClick="toggleModal(this.id)">
+                            Change 
+                        </button>
+                    </div>
+                </div>
+            {%endfor%}
+            </div>
+        </div>
+        {%endfor%}
+        <button onClick="resetScores()">Reset</button>
+        <button onClick="checkSessionStorage()">Log</button>
+        <div id="modal-element" class="modal-background">
+            <div id="modal-content" class="modal-content">
+            <button class="modal-close" onClick="closeModal()">X</button>
+            <span>Change Score:</span><br>
+            <span id="score-criteria"> </span><br>
+            <input  id="score-input"/>
+            <span id="score-error" class="modal-error"></span>
+            <button id="score-submit" onClick="changeScore()" class="score-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+</html>

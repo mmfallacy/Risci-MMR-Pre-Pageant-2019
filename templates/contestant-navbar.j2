@@ -1,0 +1,278 @@
+<html>
+    <head>
+        <style>
+            @font-face {
+                font-family:"Intro";
+                src: url("{{url_for('static',filename='styles/fonts/Intro.otf')}}") format("opentype");
+            }
+            *:focus{
+                outline:none;
+            }
+            body{
+                overflow:hidden;
+            }
+            .contestant-selector{
+                display:flex;
+                justify-content: space-between;
+                align-items:center;
+            }
+            .contestant-selector >.selectorhandler> a.selector{
+                font-size: 150%;
+                text-decoration: none;
+                width:5%;
+                padding:.2% 1%;
+                text-align: center;
+                border:1px solid yellow;
+                margin:auto;
+            }
+            .selectorhandler::-webkit-scrollbar{
+                height:0;
+            }
+            .selectorhandler{
+                display:flex;
+                justify-content:space-between;
+                white-space:nowrap;
+                overflow-x:auto;
+                overflow-y:hidden;
+                width: 85%;
+                background-color:blue;
+                padding:0;
+                margin:0;
+                height:10%;
+            }
+            .logo{
+                float:left;
+                vertical-align: center;
+                width:auto;
+            }
+            .logo > img{
+                height:80%;
+                margin-top:10%;
+                margin-left:10%;
+            }
+            .navbar{
+                align-items: center;
+                height:8vh;
+                background-color:black;
+            }
+            a {
+                text-decoration: none;
+                color:white;
+                font-family:"Intro";
+            }
+            .manual{
+                border: 3px solid blue;
+                border-radius:100%;
+                height:2%;
+                width: 3%;
+                background-color: blue;
+                font-size:150%;
+                font-family:Intro;
+            }
+            .modal-manual{
+                height:100%;
+                width:100%;
+                z-index: 2;
+                position:fixed;
+                left:0;
+                top:0;
+                background-color: rgba(0,0,0,0.7);
+                display:none;
+            }
+            .manual-content{
+                height: 75%;
+                width: 75%;
+                margin: 10% auto;
+                background-color: white;
+                overflow-y:auto;
+            }
+            .upload-modal{
+                position:fixed;
+                right:2%;
+                bottom:3%;
+                height:11%;
+                width: 21%;
+                background-color:white;
+                border: 1px solid gray;
+                border-radius: 20px;
+                padding:1%;
+                display:none;
+            }
+            .upload-modal>.content{
+                height:100%;
+                width: 100%;
+                display:flex;
+                justify-content: space-between;
+                align-items:center;
+            }
+            .upload-modal >.content> button{
+                height: 90%;
+                width: 20%;
+                background-color: green;
+                border:none;
+                border-radius: 20px;
+            }
+            .upload-modal >.content> button:hover{
+                background-color: lightgreen;
+            }
+            .upload-modal >.content> button:active{
+                background-color: darkgreen;
+            }
+            .upload-modal >.content> span{
+                color: blue;
+                font-family: Visby;
+                width: 80%;
+                font-size: 150%;
+                text-align:center;
+            }
+            .modal-summaryofscores{
+                height:100%;
+                width:100%;
+                z-index: 1;
+                position:fixed;
+                left:0;
+                top:0;
+                background-color: rgba(0,0,0,0.7);
+                display:none;
+            }
+            .modal-summaryofscores>.content{
+                height:90%;
+                width:90%;
+                margin:2.5% auto;
+                background-color:white;
+                overflow-y:auto;
+            }
+            .ss-criteria{
+                margin-left:10%;
+            }
+            .gender{
+                margin-left:5%;
+            }
+        </style>
+        <script src="{{url_for('static' ,filename='lib/jquery-3.4.1.js')}}"> </script>
+        <script>
+            var TOTAL_CONTESTANT_NUM = {{tContestantNum}};
+            var SCORE_SUMMARY = [];
+            function toggleModalElement(element){
+                $("#"+element).fadeIn("fast");
+            }
+            function closeModalElement(element){
+                $("#"+element).fadeOut("fast");
+            }
+            function checkIfUploadReady(){
+                for(let i=1;i<=TOTAL_CONTESTANT_NUM;i++){
+                    if(!("contestant-"+i in sessionStorage)) return false;
+                    let contestantScore = JSON.parse(sessionStorage.getItem("contestant-"+i))
+                    for(let gender in contestantScore){
+                        for(let criteria in contestantScore[gender]){
+                            if(contestantScore[gender][criteria]==-1) return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            function activateUploadModal(state){
+                if(state){
+                    $("#upload-modal").fadeIn("slow");
+                }
+                else{
+                    $("#upload-modal").fadeOut("slow");
+                }
+            }
+            function createScoreSummary(){
+                    for(let i=1;i<=TOTAL_CONTESTANT_NUM;i++){
+                        SCORE_SUMMARY[i-1]={}
+                        let contestantScore = JSON.parse(sessionStorage.getItem("contestant-"+i))
+                        for(let gender in contestantScore){
+                            SCORE_SUMMARY[i-1][gender] = {};
+                            for(let criteria in contestantScore[gender]){
+                                SCORE_SUMMARY[i-1][gender][criteria] = contestantScore[gender][criteria];
+                                $("#contestant-"+i+"-div>."+gender+"-scores>"+"."+criteria+">.ss-placeholder").text(contestantScore[gender][criteria]);
+                            }
+                        }
+                    }
+                toggleModalElement("modal-element-summaryofscores");
+            }
+            function uploadScoreSummary(){
+                $.ajax({
+                    url:"http://{{request.host}}/upload",
+                    type:"POST",
+                    data: {"SS":JSON.stringify(SCORE_SUMMARY)},
+                    success: function(){location.href = "http://{{request.host}}/";}
+                });
+            }
+            $(window).click(function(event) {
+                if (event.target.id == "modal-element-manual") {
+                    closeModalElement("modal-element-manual");
+                }
+                if (event.target.id == "modal-element-summaryofscores") {
+                    closeModalElement("modal-element-summaryofscores");
+                }
+            });
+            $(window).on("load", function(){
+                $(document).on('keydown', function(e) {
+                    if(e.which == 112){
+                        e.preventDefault();
+                        toggleModalElement("modal-element-manual");
+                    }
+                });
+                $('.selectorhandler').on("mousewheel",function(e) {
+                    this.scrollLeft -= (e.originalEvent.wheelDelta * 2);
+                    e.preventDefault();
+                });
+                activateUploadModal(checkIfUploadReady());
+            });
+        </script>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="contestant-selector">
+                <a class="logo" href="/"><img src="{{url_for('static',filename='images/mmr.png')}}"/></a>
+                <div class="selectorhandler">
+                    {% for contestant in range(0,tContestantNum) %}
+                        <a class="selector" href="/{{loop.index}}">{{loop.index}}</a>
+                    {% endfor %}
+                </div>
+                <button id="manual-button" class="manual" onClick="toggleModalElement('modal-element-manual')">?</button>
+            </div>
+        </div>
+        
+        <div id="modal-element-manual" tabIndex=1 class="modal-manual">
+            <div class="manual-content">
+                {% include "manual.html" %}
+            </div>
+        </div>
+
+        <div id="upload-modal" class="upload-modal">
+            <div class="content"> 
+                <span>Ready to Upload!</span>
+                <button id="upload-button" onClick="createScoreSummary()">>></button>
+            </div>
+        </div>
+
+        <div id="modal-element-summaryofscores" class="modal-summaryofscores">
+            <div class="content">
+                {% for i in range(1,tContestantNum+1)%}
+                <div id="contestant-{{i|string}}-div">
+                    <span> Contestant {{i}}</span>
+                    <div class="M-scores">
+                        <span class="gender"> Male: </span> <br>
+                        <span class="ss-criteria creativeness"> Creativeness: <span class="ss-placeholder">00</span></span> <br>
+                        <span class="ss-criteria stagepresence"> Stage Presence/Stance: <span class="ss-placeholder">00</span></span> <br>
+                        <span class="ss-criteria appropriateness"> Appropriateness: <span class="ss-placeholder">00</span></span> <br>
+                    </div>
+                    <div class="F-scores">
+                        <span class="gender"> Female: </span> <br>
+                        <span class="ss-criteria creativeness"> Creativeness: <span class="ss-placeholder">00</span></span> <br>
+                        <span class="ss-criteria stagepresence"> Stage Presence/Stance: <span class="ss-placeholder">00</span></span> <br>
+                        <span class="ss-criteria appropriateness"> Appropriateness: <span class="ss-placeholder">00</span></span> <br>
+                    </div>
+                </div>
+                <br>
+                {% endfor %}
+                <button onClick="uploadScoreSummary();">UPLOAD!</button>
+            </div>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,9 @@
+{
+    "DEBUG":true,
+    "PORT":"35223",
+    "DATE":"2019",
+    "JUDGENUM":2,
+    "THEMES":["Thematic","Casual","Evening"],
+    "CRITERIA":{"Creativeness":30,"Stage Presence/Stance":45,"Appropriateness":10},
+    "PALETTE":["red","blue","green","#8EE4AF"]
+}

@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <script src="{{url_for('static' ,filename='lib/socket.io.min.js')}}"> </script>
+        <script src="{{url_for('static' ,filename='lib/jquery-3.4.1.js')}}"> </script>
+        <script>
+            $(document).ready(function(){
+                var socket=  io.connect('http://{{request.host}}/websock');
+                
+                socket.on("resultsAvailable",function(msg){
+                    alert('RESULT AVAILABLE')
+                    location.href = 'http://{{request.host}}/'
+                });
+            });
+        </script>
+    </head>
+    <body>
+    <h1>SUBMITTED:{{username}}</h1> <br><br>{{jsonContent}}
+    </body>
+</html>

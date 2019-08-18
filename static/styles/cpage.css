@@ -1,0 +1,155 @@
+
+@font-face {
+    font-family:"Hangar";
+    src: url("fonts/Hangar-Flat.woff") format("woff");
+}
+@font-face {
+    font-family:"Visby";
+    src: url("fonts/VisbyRoundCF-Regular.otf") format("opentype");
+}
+.x{
+    border:1px solid black;
+}
+div#contestant-page{
+    width: 100%;
+    max-height:85vh;
+    overflow-y:scroll;
+}
+div.outer {
+    display: flex;
+    justify-content:space-between;
+    width: 100%;
+    height: 60%;
+}
+div.innerL {
+    width: 12%;
+    height: 100%;
+    margin-left: 5vw;
+}
+div.innerR {
+    width: 58%;
+    height: 100%;
+    margin-right: 6vw;
+}
+img.cts {
+    display: block;
+    margin:auto;
+    margin-top:5%;
+    height: 85%;
+}
+div.criteria_score {
+    width: 100%;
+    height: 22%;
+    display:flex;
+}
+div.score {
+    width: 25%;
+    height: 100%;
+    float:right;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+
+}
+body{
+    margin:0;
+    padding:0;
+    background-color: white;
+}
+.criteria {
+    font-family: "Visby";
+    font-size: 250%;
+    margin:0;
+    vertical-align: center;
+    height: 100%;
+    width: 75%;
+    display:flex;
+    align-items:center;
+}
+.contestant-number {
+    font-family: "Visby";
+    font-size: 300%;
+    margin:0;
+    margin-left:5%;
+    vertical-align: center;
+}
+.score-placeholder {
+    height: 77%;
+    padding-top:3%;
+    width:25%;
+    font-family:"Visby";
+    font-size: 250%;
+    text-align: center;
+}
+.score-max{
+    font-size:150%;
+    width: 15%;
+    margin-right:20%;
+    margin-top: 15%;
+    font-family:"Visby";
+}
+.score > button {
+    height: 30%;
+    font-family: "Visby";
+    border-radius: 10px;
+    border: 1px solid black;
+    background-color:rgba(255,255,255,.6);
+}
+.scoreWord {
+    font-family: "Hangar";
+    font-size: 150%;
+    margin-left:82%;
+}
+.modal-background{
+    position: fixed;
+    left: 0;
+    top:0;
+    background-color:rgba(0,0,0,0.5);
+    width:100%;
+    height:100%;
+    z-index:1;
+    display:none;
+}
+.modal-content{
+    margin: 15% auto;
+    height: 40%;
+    width: 30%;
+    background-color: white;
+    display:flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+.modal-content>input{
+    margin:auto;
+    width:20%;
+    padding:3% 1%;
+    font-family: Visby;
+    font-size:200%;
+    text-align:center;
+}
+.modal-content>.score-submit{
+    margin:auto;
+    padding:1%;
+}
+.modal-close{
+    margin-left:90%;
+    font-size:100%;
+    font-family:"Intro";
+    background-color:transparent;
+    border:none;
+}
+.modal-content>span{
+    font-size:100%;
+    font-family:"Visby";
+    height:10%;
+    width:100%;
+    text-align: center;
+}
+.modal-error{
+    font-size:100%;
+    font-family:"Visby";
+    color:red;
+    height:10%;
+    width:100%;
+    text-align: center;
+}
